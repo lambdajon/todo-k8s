@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-frontend
+  labels:
+    app: todo-frontend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: todo-frontend
+    spec:
+      containers:
+        - name: todo-frontend
+          image: ahmadulinjs/todoclient:latest
+          ports:
+            - containerPort: 80
+              name: http-port
+          env:
+            - name: CLOUDL_SERVER
+              value: cloudl-server-service
+  selector:
+    matchLabels:
+      app: todo-frontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-frontend-service
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: http-port
+      nodePort: 30002
+  selector:
+    app: todo-frontend
+  type: LoadBalancer

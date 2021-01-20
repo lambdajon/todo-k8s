@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-mongo
+  labels:
+    app: todo-mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-mongodb
+  template:
+    metadata:
+      labels:
+        app: todo-mongodb
+    spec:
+      containers:
+      - name: todo-mongodb
+        image: mongo
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "128Mi"
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: todo-mongo-secret
+              key: MONGO_ROOT_USERNAME
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: todo-mongo-secret
+              key: MONGO_ROOT_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-mongo-service
+spec:
+  selector:
+    app: todo-mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
