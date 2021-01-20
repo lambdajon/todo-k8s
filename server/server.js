@@ -81,6 +81,12 @@ todoRoutes.route('/update/:id').post((req, res) => {
 });
 
 app.use('/todos', todoRoutes);
+app.use('/status', (req, res) => {
+
+	res.json({
+		msg: "OK"
+	});
+})
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
 	console.log("Server is running on port " + PORT);
