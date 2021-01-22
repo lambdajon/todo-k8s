@@ -5,14 +5,36 @@ const mongoose = require('mongoose');
 const todoRoutes = express.Router();
 let Todo = require('./todo.model');
 require('dotenv').config();
+const multer = require('multer');
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		// cb(null, __dirname+'/../static/')
+		cb(null, 'data/')
+	},
+	filename: function (req, file, cb) {
+		const fileExt = (file.originalname.split('.'))[1]
+		cb(null, `${file.fieldname}-${Date.now()}.${fileExt}`)
+	}
+})
 
+const fileUpload = multer({
+	// dest: '../static/',
+	dest: './data/',
+	// storage,
+	// onFileUploadStart: function (file) {
+	// 	console.log(file.originalname + ' is starting ...')
+	// },
+})
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
 
-const db = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_SERVER}`;
+let db = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_SERVER}`;
 
+if (process.env.MONGO_AUTH_DISABLE) {
+	db = 'mongodb://localhost:27017/todo-app'
+}
 console.log("DATABASE URL:")
 console.log(db)
 console.log("DATABASE URL:")
@@ -33,55 +55,49 @@ connection.once('open', () => {
 	console.log("MongoDB database connection established successfully");
 });
 
-todoRoutes.route('/').get((req, res) => {
-	Todo.find((err, todos) => {
-		if (err)
-			console.log(err);
-		else {
-			res.json(todos);
-		}
-	});
+todoRoutes.route('/').get(async (req, res, next) => {
+	try {
+		const data = await Todo.find();
+		res.json(data)
+	} catch (e) {
+		next(e);
+	}
 });
 
-todoRoutes.route('/:id').get((req, res) => {
-	const id = req.params.id;
-	Todo.findById(id, (err, todo) => {
-		res.json(todo);
-	});
+todoRoutes.route('/:id').get(async (req, res, next) => {
+	try {
+		const id = req.params.id;
+		const todo = await Todo.findById(id)
+		res.json(todo)
+	} catch (e) {
+		next(e);
+	}
+});
+todoRoutes.route('/').post(fileUpload.single('file'), async (req, res, next) => {
+	try {
+		console.log(req.file)
+		const todo = new Todo(req.body);
+		const data = await todo.save()
+		res.json(data)
+	} catch (e) {
+		next(e);
+		throw new Error(`todos create error: ${e}`)
+	}
 });
 
-todoRoutes.route('/add').post((req, res) => {
-	const todo = new Todo(req.body);
-	todo.save()
-		.then(todo => {
-			res.status(200).json({ 'todo': 'todo added successfully' });
-		})
-		.catch(err => {
-			res.status(400).send('adding new todo failed');
-		});
-});
+todoRoutes.route('/:id').put(async (req, res, next) => {
+	try {
+		const updated = await Todo.findByIdAndUpdate(req.params.id, req.body)
+		res.json(updated);
 
-todoRoutes.route('/update/:id').post((req, res) => {
-	Todo.findById(req.params.id, (err, todo) => {
-		if (!todo)
-			res.status(404).send('Data is not found');
-		else {
-			todo.todo_description = req.body.todo_description;
-			todo.todo_responsible = req.body.todo_responsible;
-			todo.todo_priority = req.body.todo_priority;
-			todo.todo_completed = req.body.todo_completed;
-			todo.save().then(todo => {
-				res.json('Todo updated');
-			})
-				.catch(err => {
-					res.status(400).send("Update not possible");
-				});
-		}
-	});
+	} catch (e) {
+		next(e)
+		throw new Error(`todos update error: ${e}`)
+	}
 });
 
 app.use('/todos', todoRoutes);
-app.use('/status', (req, res) => {
+app.use('/status', (req, res, next) => {
 
 	res.json({
 		msg: "OK"

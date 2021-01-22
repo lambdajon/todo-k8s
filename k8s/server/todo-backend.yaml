@@ -19,7 +19,7 @@ spec:
         image: ahmadulinjs/todoserver
         resources:
           limits:
-            cpu: "500m"
+            cpu: "100m"
             memory: "512Mi"
         ports:
         - containerPort: 5000
@@ -52,4 +52,4 @@ spec:
     - protocol: TCP
       port: 5000
       targetPort: 5000
-      # nodePort: 30001
+      nodePort: 30009

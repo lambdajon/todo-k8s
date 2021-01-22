@@ -18,8 +18,8 @@ spec:
             - containerPort: 80
               name: http-port
           env:
-            - name: CLOUDL_SERVER
-              value: cloudl-server-service
+            - name: TODO_SERVER
+              value: todo-backend-service 
   selector:
     matchLabels:
       app: todo-frontend
@@ -33,7 +33,6 @@ spec:
     - port: 80
       protocol: TCP
       targetPort: http-port
-      nodePort: 30002
   selector:
     app: todo-frontend
   type: LoadBalancer

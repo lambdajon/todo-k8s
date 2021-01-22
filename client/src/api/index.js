@@ -1,16 +1,20 @@
 import axios from 'axios';
+const api = axios.create({
+  baseURL: 'http://localhost:5000',
+  timeout: 50000,
+});
 
 export default class API {
   static listTodos() {
-    return axios.get(`/api/todos`)
+    return api.get(`/todos`)
   }
   static createTodo(data) {
-    return axios.post(`/api/todos/add`, data)
+    return api.post(`/todos`, data)
   }
   static loadTodo(id){
-    return axios.get(`/api/todos/${id}`)
+    return api.get(`/todos/${id}`)
   }
   static updateTodo(id,data){
-    return axios.post(`/api/todos/${id}`)
+    return api.put(`/todos/${id}`, data)
   }
 }
