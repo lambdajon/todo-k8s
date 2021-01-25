@@ -27,7 +27,7 @@ export default class CreateTodo extends Component {
     this.setState({ todo_priority: e.target.value });
   }
 
-  onSubmit(e) {
+  onSubmit = (e) => {
     e.preventDefault();
 
     // console.log(e.target.value)
@@ -45,6 +45,7 @@ export default class CreateTodo extends Component {
       todo_completed: this.state.todo_completed
     }
 
+    console.log(newTodo)
     api.createTodo(newTodo)
       .then(res => console.log(res.data));
 
