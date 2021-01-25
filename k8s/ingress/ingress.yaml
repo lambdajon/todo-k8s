@@ -1,35 +1,38 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: ingress-todo-frontend-service
+  name: ingress-todo
   annotations:
-    # use the shared ingress-nginx
     kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: example.com
-    http:
+  - http:
       paths:
       - path: /?(.*)
         backend:
           serviceName: todo-frontend-service
           servicePort: 80
----
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  name: ingress-todo-backend-service
-  annotations:
-    # use the shared ingress-nginx
-    kubernetes.io/ingress.class: "nginx"
-spec:
-  rules:
-  - http:
-      paths:
       - path: /api/?(.*)
         backend:
           serviceName: todo-backend-service
           servicePort: 5000
+
+# apiVersion: networking.k8s.io/v1beta1
+# kind: Ingress
+# metadata:
+#   name: ingress-todo-backend-service
+#   annotations:
+#     # use the shared ingress-nginx
+#     kubernetes.io/ingress.class: "nginx"
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#       - path: /api/?(.*)
+#         backend:
+#           serviceName: todo-backend-service
+#           servicePort: 5000
 
 # apiVersion: networking.k8s.io/v1beta1
 # kind: Ingress

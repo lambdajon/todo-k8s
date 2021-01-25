@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const todoRoutes = express.Router();
+var morgan = require('morgan')
 let Todo = require('./todo.model');
 require('dotenv').config();
 const multer = require('multer');
@@ -27,8 +28,16 @@ const fileUpload = multer({
 })
 const app = express();
 
+app.use(morgan('combined'))
+
 app.use(cors());
 app.use(bodyParser.json());
+app.get('/', (req, res, next) => {
+
+	res.json({
+		msg: "HELLO WORLD"
+	});
+})
 
 let db = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_SERVER}`;
 

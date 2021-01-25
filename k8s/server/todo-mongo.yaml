@@ -1,12 +1,11 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: todo-mongo
   labels:
     app: todo-mongodb
 spec:
-  serviceName: todo-mongo-service
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: todo-mongodb
@@ -20,8 +19,8 @@ spec:
         image: mongo
         resources:
           limits:
-            cpu: "100m"
-            memory: "512Mi"
+            cpu: "50m"
+            memory: "128Mi"
         ports:
         - containerPort: 27017
         env:
@@ -35,13 +34,6 @@ spec:
             secretKeyRef:
               name: todo-mongo-secret
               key: MONGO_ROOT_PASSWORD
-        volumeMounts:
-          - name: data
-            mountPath: /data/db
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: todo-volume-claim
 ---
 apiVersion: v1
 kind: Service
@@ -53,4 +45,4 @@ spec:
   ports:
     - protocol: TCP
       port: 27017
-      targetPort: 27017
+      targetPort: 27017 

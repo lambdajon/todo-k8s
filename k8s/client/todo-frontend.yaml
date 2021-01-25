@@ -13,7 +13,11 @@ spec:
     spec:
       containers:
         - name: todo-frontend
-          image: ahmadulinjs/todoclient:latest
+          image: ahmadulinjs/todoclient
+          resources:
+            limits:
+              cpu: "50m"
+              memory: "150Mi"
           ports:
             - containerPort: 80
               name: http-port
@@ -32,7 +36,7 @@ spec:
   ports:
     - port: 80
       protocol: TCP
-      targetPort: http-port
+      targetPort: 80
   selector:
     app: todo-frontend
-  type: LoadBalancer
+  type: NodePort

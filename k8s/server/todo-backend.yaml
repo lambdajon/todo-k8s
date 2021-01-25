@@ -20,7 +20,7 @@ spec:
         resources:
           limits:
             cpu: "100m"
-            memory: "512Mi"
+            memory: "256Mi"
         ports:
         - containerPort: 5000
         env:
@@ -47,9 +47,8 @@ metadata:
 spec:
   selector:
     app: todo-backend
-  type: LoadBalancer
+  type: NodePort
   ports:
     - protocol: TCP
       port: 5000
       targetPort: 5000
-      nodePort: 30009

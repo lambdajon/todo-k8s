@@ -1,29 +1,17 @@
-# => Build container
+
 FROM node:12.20.1-alpine as build
 
+RUN mkdir /app
 
-WORKDIR /todo-client
+WORKDIR /app
 
-COPY package.json /todo-client/package.json
+COPY package.json /app
 
 RUN npm install
 
-RUN npm install react-scripts -g
-
-COPY . /todo-client
+COPY . /app
 
 RUN npm run build
+FROM nginx:1.17.1-alpine
 
-# => Run container
-FROM nginx:1.16.0
-
-COPY --from=build /todo-client/build /usr/share/nginx/html
-
-RUN rm /etc/nginx/conf.d/default.conf
-
-COPY nginx/nginx.conf /etc/nginx/conf.d
-
-EXPOSE 80
-
-# Start Nginx server
-CMD ["/bin/bash", "-c", "nginx -g \"daemon off;\""]
+COPY --from=build /app/build /usr/share/nginx/html
