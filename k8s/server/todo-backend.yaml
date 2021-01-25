@@ -47,7 +47,7 @@ metadata:
 spec:
   selector:
     app: todo-backend
-  type: NodePort
+  type: ClusterIP
   ports:
     - protocol: TCP
       port: 5000

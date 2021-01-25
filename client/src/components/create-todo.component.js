@@ -30,13 +30,13 @@ export default class CreateTodo extends Component {
   onSubmit(e) {
     e.preventDefault();
 
-    console.log(e.target.value)
+    // console.log(e.target.value)
     // SUBMIT LOGIC NEED TO BE IMPLEMENTED HERE
-    console.log('Form submitteed:');
-    console.log(`Todo Description: ${this.state.todo_description}`);
-    console.log(`Todo Responsible: ${this.state.todo_responsible}`);
-    console.log(`Todo Priority: ${this.state.todo_priority}`);
-    console.log(`Todo Completed: ${this.state.todo_completed}`);
+    // console.log('Form submitteed:');
+    // console.log(`Todo Description: ${this.state.todo_description}`);
+    // console.log(`Todo Responsible: ${this.state.todo_responsible}`);
+    // console.log(`Todo Priority: ${this.state.todo_priority}`);
+    // console.log(`Todo Completed: ${this.state.todo_completed}`);
 
     const newTodo = {
       todo_description: this.state.todo_description,
