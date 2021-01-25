@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: todo-frontend
-          image: ahmadulinjs/todoclient
+          image: ahmadulinjs/todoclient:latest
           resources:
             limits:
               cpu: "50m"

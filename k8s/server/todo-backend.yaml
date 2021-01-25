@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: todo-backend
-        image: ahmadulinjs/todoserver
+        image: ahmadulinjs/todoserver:latest
         resources:
           limits:
             cpu: "100m"
