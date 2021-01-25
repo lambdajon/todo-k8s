@@ -1,11 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const mongoose = require('mongoose');
 const todoRoutes = express.Router();
 var morgan = require('morgan')
 let Todo = require('./todo.model');
 require('dotenv').config();
+const DB = require('./db');
 const multer = require('multer');
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
@@ -39,30 +39,28 @@ app.get('/', (req, res, next) => {
 	});
 })
 
-let db = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_SERVER}`;
+// let db = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_SERVER}`;
 
-if (process.env.MONGO_AUTH_DISABLE) {
-	db = 'mongodb://localhost:27017/todo-app'
-}
-console.log("DATABASE URL:")
-console.log(db)
-console.log("DATABASE URL:")
+// if (process.env.MONGO_AUTH_DISABLE) {
+// 	db = 'mongodb://localhost:27017/todo-app'
+// }
 
-mongoose.connect(db, {
-	autoIndex: false,
-	useNewUrlParser: true,
-	useFindAndModify: false,
-	useUnifiedTopology: true,
-	serverSelectionTimeoutMS: 5000,
-});
-const connection = mongoose.connection;
+
+// mongoose.connect(db, {
+// 	autoIndex: false,
+// 	useNewUrlParser: true,
+// 	useFindAndModify: false,
+// 	useUnifiedTopology: true,
+// 	serverSelectionTimeoutMS: 5000,
+// });
+// let connection = mongoose.connection;
 
 
 // Once the connection is established, callback 
 // mongodb://localhost:27017/myapp
-connection.once('open', () => {
-	console.log("MongoDB database connection established successfully");
-});
+// connection.once('open', () => {
+// 	console.log("MongoDB database connection established successfully");
+// });
 
 todoRoutes.route('/').get(async (req, res, next) => {
 	try {
@@ -112,7 +110,24 @@ app.use('/status', (req, res, next) => {
 		msg: "OK"
 	});
 })
-const PORT = process.env.PORT || 5000
-app.listen(PORT, () => {
-	console.log("Server is running on port " + PORT);
-});
+
+let cachedDB = null;
+
+async function init() {
+	// Setup MongoDB
+	if (cachedDB && cachedDB.serverConfig.isConnected()) {
+		console.log('using cached database instance');
+		Promise.resolve(cachedDB);
+	} else {
+		const db = new DB();
+		console.log('creating new Db connection');
+		cachedDB = db.connect();
+	}
+
+	const PORT = process.env.PORT || 5000
+	app.listen(PORT, () => {
+		console.log("Server is running on port " + PORT);
+	});
+}
+
+init()

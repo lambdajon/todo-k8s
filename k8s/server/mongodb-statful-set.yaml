@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: todo-mongo
+  labels:
+    app: todo-mongodb
+spec:
+  serviceName: todo-mongo-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-mongodb
+  template:
+    metadata:
+      labels:
+        app: todo-mongodb
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: todo-mongodb
+        args:
+        - --replSet=rs0
+        - --smallfiles
+        - --noprealloc
+        command:
+        - mongod
+        image: mongo:3.6
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: todo-mongo-secret
+              key: MONGO_ROOT_USERNAME
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: todo-mongo-secret
+              key: MONGO_ROOT_PASSWORD
+        volumeMounts:
+          - name: data
+            mountPath: /data/db
+      - name: mongo-sidecar
+        image: cvallance/mongo-k8s-sidecar
+        env:
+          - name: MONGO_SIDECAR_POD_LABELS
+            value: "role=mongo,environment=test"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: todo-volume-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-mongo-service
+spec:
+  selector:
+    app: todo-mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
