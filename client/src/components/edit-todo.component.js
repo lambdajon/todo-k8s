@@ -59,10 +59,10 @@ export default class EditTodo extends Component {
         //     todo_priority: this.state.todo_priority,
         //     todo_completed: this.state.todo_completed
         // };
-        // api.updateTodo(this.props.match.params.id, obj)
-        //     .then( res => console.log(res.data));
+        api.updateTodo(this.props.match.params.id, obj)
+            .then( res => console.log(res.data));
 
-        // this.props.history.push('/');
+        this.props.history.push('/');
     }
 
     render() {

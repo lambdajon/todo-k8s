@@ -6,6 +6,11 @@ metadata:
     app: todo-backend
 spec:
   replicas: 2
+  # strategy:
+  #   type: RollingUpdate
+  #   rollingUpdate:
+  #     maxSurge: 2        # how many pods we can add at a time
+  #     maxUnavailable: 0
   selector:
     matchLabels:
       app: todo-backend
