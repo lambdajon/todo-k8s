@@ -5,12 +5,12 @@ metadata:
   labels:
     app: todo-backend
 spec:
-  replicas: 2
-  # strategy:
-  #   type: RollingUpdate
-  #   rollingUpdate:
-  #     maxSurge: 2        # how many pods we can add at a time
-  #     maxUnavailable: 0
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1      
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: todo-backend
@@ -23,11 +23,21 @@ spec:
       - name: todo-backend
         image: ahmadulinjs/todoserver:latest
         resources:
+          requests:
+            cpu: "20m"
+            memory: "50Mi"
           limits:
-            cpu: "200m"
-            memory: "300Mi"
+            cpu: "900m"
+            memory: "900Mi"
         ports:
         - containerPort: 5000
+        readinessProbe:
+          httpGet:
+            path: /status
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
         env:
         - name: MONGODB_USER
           valueFrom:
@@ -52,8 +62,9 @@ metadata:
 spec:
   selector:
     app: todo-backend
-  type: ClusterIP
+  type: NodePort
   ports:
     - protocol: TCP
       port: 5000
       targetPort: 5000
+      nodePort: 30010
